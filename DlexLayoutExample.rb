@@ -39,6 +39,26 @@ class DlexLayoutExample
       puts response.error_json
     end
   end
+  
+  def run_from_local_with_files(api_key, base_path, output_path)
+    layout_data = LayoutDataResource.new(FileUtility.get_path("#{base_path}ExampleTemplate.json"))
+    dlex_resource = DlexResource.new(FileUtility.get_path("#{base_path}ExampleTemplate.dlex"), "ExampleTemplate.dlex")
+    dlex_endpoint = DlexLayout.new(dlex_resource, layout_data)
+  
+    dlex_endpoint.add_additional_resource(FileUtility.get_path("#{base_path}template_example.pdf"), "template_example.pdf")
+    dlex_endpoint.add_additional_resource(FileUtility.get_path("#{base_path}signature-one.png"), "signature-one.png")
+  
+    dlex_endpoint.api_key = api_key
+    response = dlex_endpoint.process
+  
+    if response.successful?
+      File.write(FileUtility.get_path("#{output_path}local-template-example-output.pdf"), response.content)
+    else
+      puts response.error_json
+    end
+  end
+  
+
 end
 
 DlexLayoutExample.run(CLIENT_EXAMPLES_API_KEY, "#{CLIENT_EXAMPLES_BASE_PATH}creating-pdf-dlex-layout/", CLIENT_EXAMPLES_OUTPUT_PATH)
